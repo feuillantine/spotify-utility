@@ -3,8 +3,17 @@
   "version": "0.1.0",
   "description": "Personal Spotify Web API utility helpers.",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "sideEffects": false,
   "files": [
     "dist"
   ],
@@ -12,7 +21,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "biome check . --write --unsafe",
-    "build": "tsc -p tsconfig.build.json"
+    "build": "tsup",
+    "dev": "tsup --watch"
   },
   "keywords": [
     "spotify",
@@ -22,12 +32,12 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "spotify-web-api-node": "^5.0.2"
+    "@spotify/web-api-ts-sdk": "^1.2.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.2",
     "@types/node": "^24.0.15",
-    "@types/spotify-web-api-node": "^5.0.11",
+    "tsup": "^8.5.1",
     "typescript": "^5.8.3"
   }
 }

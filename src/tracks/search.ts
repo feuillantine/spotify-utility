@@ -1,4 +1,4 @@
-import type SpotifyWebApi from 'spotify-web-api-node';
+import type { SpotifyApi } from '@spotify/web-api-ts-sdk';
 import { withRetry } from '@/utils/retry';
 import type { SearchTrackResult } from './types';
 
@@ -6,17 +6,12 @@ import type { SearchTrackResult } from './types';
  * 任意の検索クエリから最初のトラックを取得する
  */
 export const searchTrack = async (
-  client: SpotifyWebApi,
+  client: SpotifyApi,
   query: string,
 ): Promise<SearchTrackResult | null> => {
-  const response = await withRetry(() =>
-    client.searchTracks(query, {
-      market: 'JP',
-      limit: 1,
-    }),
-  );
+  const response = await withRetry(() => client.search(query, ['track'], 'JP', 1));
 
-  const track = response.body.tracks?.items?.[0];
+  const track = response.tracks?.items?.[0];
   if (!track) {
     return null;
   }

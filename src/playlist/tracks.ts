@@ -1,17 +1,17 @@
-import type SpotifyWebApi from 'spotify-web-api-node';
+import type { SpotifyApi } from '@spotify/web-api-ts-sdk';
 import { chunk } from '@/utils/chunk';
 import { withRetry } from '@/utils/retry';
 import { sleep } from '@/utils/sleep';
 import type { PlaylistTrack } from './types';
 
-const PLAYLIST_LIMIT = 100;
+const PLAYLIST_LIMIT = 50;
 const INTERVAL_MS = 150;
 
 /**
  * プレイリスト内のトラックURIを取得する
  */
 export const getTrackUris = async (
-  client: SpotifyWebApi,
+  client: SpotifyApi,
   playlistId: string,
 ): Promise<Set<string>> => {
   const uris: string[] = [];
@@ -20,19 +20,16 @@ export const getTrackUris = async (
 
   while (offset < total) {
     const response = await withRetry(() =>
-      client.getPlaylistTracks(playlistId, {
-        limit: PLAYLIST_LIMIT,
-        offset,
-      }),
+      client.playlists.getPlaylistItems(playlistId, 'JP', undefined, PLAYLIST_LIMIT, offset),
     );
 
     uris.push(
-      ...((response.body.items ?? [])
+      ...((response.items ?? [])
         .map((item) => item.track?.uri ?? null)
         .filter((uri) => uri !== null) as string[]),
     );
 
-    total = response.body.total ?? 0;
+    total = response.total ?? 0;
     offset += PLAYLIST_LIMIT;
 
     await sleep(INTERVAL_MS);
@@ -45,7 +42,7 @@ export const getTrackUris = async (
  * プレイリストのトラック情報を取得する
  */
 export const getTracks = async (
-  client: SpotifyWebApi,
+  client: SpotifyApi,
   playlistId: string,
 ): Promise<PlaylistTrack[]> => {
   const tracks: PlaylistTrack[] = [];
@@ -54,14 +51,11 @@ export const getTracks = async (
 
   while (offset < total) {
     const response = await withRetry(() =>
-      client.getPlaylistTracks(playlistId, {
-        limit: PLAYLIST_LIMIT,
-        offset,
-      }),
+      client.playlists.getPlaylistItems(playlistId, 'JP', undefined, PLAYLIST_LIMIT, offset),
     );
 
     tracks.push(
-      ...((response.body.items ?? [])
+      ...((response.items ?? [])
         .map((item) =>
           item.track
             ? {
@@ -75,7 +69,7 @@ export const getTracks = async (
         .filter((track) => track !== null) as PlaylistTrack[]),
     );
 
-    total = response.body.total ?? 0;
+    total = response.total ?? 0;
     offset += PLAYLIST_LIMIT;
 
     await sleep(INTERVAL_MS);
@@ -88,7 +82,7 @@ export const getTracks = async (
  * 指定したプレイリストに、指定したURIの楽曲を追加する
  */
 export const addTracks = async (
-  client: SpotifyWebApi,
+  client: SpotifyApi,
   playlistId: string,
   uris: Set<string>,
 ): Promise<void> => {
@@ -107,7 +101,7 @@ export const addTracks = async (
     }
 
     await withRetry(async () => {
-      await client.addTracksToPlaylist(playlistId, batch);
+      await client.playlists.addItemsToPlaylist(playlistId, batch);
     });
 
     await sleep(INTERVAL_MS);
@@ -118,7 +112,7 @@ export const addTracks = async (
  * 指定したプレイリストから、指定したURIの楽曲を削除する
  */
 export const removeTracks = async (
-  client: SpotifyWebApi,
+  client: SpotifyApi,
   playlistId: string,
   uris: Set<string>,
 ): Promise<void> => {
@@ -130,10 +124,9 @@ export const removeTracks = async (
     }
 
     await withRetry(async () => {
-      await client.removeTracksFromPlaylist(
-        playlistId,
-        batch.map((uri) => ({ uri })),
-      );
+      await client.playlists.removeItemsFromPlaylist(playlistId, {
+        tracks: batch.map((uri) => ({ uri })),
+      });
     });
 
     await sleep(INTERVAL_MS);

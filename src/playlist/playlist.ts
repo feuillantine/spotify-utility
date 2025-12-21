@@ -1,4 +1,4 @@
-import type SpotifyWebApi from 'spotify-web-api-node';
+import type { SpotifyApi } from '@spotify/web-api-ts-sdk';
 import { withRetry } from '@/utils/retry';
 import { sleep } from '@/utils/sleep';
 
@@ -8,9 +8,9 @@ const INTERVAL_MS = 150;
 /**
  * 自身がフォローしているプレイリストのURIを全件取得する
  */
-export const getMyFollowedUris = async (client: SpotifyWebApi): Promise<Set<string>> => {
-  const me = await withRetry(() => client.getMe());
-  const currentUserId = me.body.id ?? undefined;
+export const getMyFollowedUris = async (client: SpotifyApi): Promise<Set<string>> => {
+  const me = await withRetry(() => client.currentUser.profile());
+  const currentUserId = me.id ?? undefined;
 
   const uris: string[] = [];
   let offset = 0;
@@ -18,19 +18,16 @@ export const getMyFollowedUris = async (client: SpotifyWebApi): Promise<Set<stri
 
   while (offset < total) {
     const response = await withRetry(() =>
-      client.getUserPlaylists({
-        limit: PLAYLIST_LIST_LIMIT,
-        offset,
-      }),
+      client.currentUser.playlists.playlists(PLAYLIST_LIST_LIMIT, offset),
     );
 
     uris.push(
-      ...(response.body.items ?? [])
+      ...(response.items ?? [])
         .filter((item) => item.owner.id !== currentUserId)
         .map((item) => item.uri),
     );
 
-    total = response.body.total ?? 0;
+    total = response.total ?? 0;
     offset += PLAYLIST_LIST_LIMIT;
 
     await sleep(INTERVAL_MS);

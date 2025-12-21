@@ -1,25 +1,27 @@
-import SpotifyWebApi from 'spotify-web-api-node';
-import { SpotifyAuthService } from './auth/service';
+import { type SdkOptions, SpotifyApi } from '@spotify/web-api-ts-sdk';
+import { fetchRefreshedToken } from './auth/token';
 import { SpotifyPlaylistService } from './playlist/service';
 import { SpotifyTrackService } from './tracks/service';
 
-export type SpotifyUtilityOptions = ConstructorParameters<typeof SpotifyWebApi>[0];
+export interface SpotifyCredentials {
+  clientId: string;
+  clientSecret: string;
+  refreshToken: string;
+}
 
 /**
- * Spotify Web API を操作するためのユーティリティクラス
+ * Spotify API を操作するためのユーティリティクラス
  */
-export class SpotifyUtility {
-  readonly auth: SpotifyAuthService;
+class SpotifyUtility {
   readonly playlists: SpotifyPlaylistService;
   readonly tracks: SpotifyTrackService;
 
-  constructor(private readonly client: SpotifyWebApi) {
-    this.auth = new SpotifyAuthService(client);
+  constructor(private readonly client: SpotifyApi) {
     this.playlists = new SpotifyPlaylistService(client);
     this.tracks = new SpotifyTrackService(client);
   }
 
-  get rawClient(): SpotifyWebApi {
+  get rawClient(): SpotifyApi {
     return this.client;
   }
 }
@@ -28,15 +30,11 @@ export class SpotifyUtility {
  * SpotifyUtility インスタンスを生成する
  */
 export const createSpotifyUtility = async (
-  options: SpotifyUtilityOptions,
-  { autoRefresh = true }: { autoRefresh?: boolean } = {},
+  credentials: SpotifyCredentials,
+  sdkOptions?: SdkOptions,
 ): Promise<SpotifyUtility> => {
-  const client = new SpotifyWebApi(options);
-  const utility = new SpotifyUtility(client);
+  const token = await fetchRefreshedToken(credentials);
+  const client = SpotifyApi.withAccessToken(credentials.clientId, token, sdkOptions);
 
-  if (autoRefresh) {
-    await utility.auth.refreshAccessToken();
-  }
-
-  return utility;
+  return new SpotifyUtility(client);
 };

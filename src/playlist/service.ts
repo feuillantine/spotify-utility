@@ -1,10 +1,10 @@
-import type SpotifyWebApi from 'spotify-web-api-node';
+import type { SpotifyApi } from '@spotify/web-api-ts-sdk';
 import { getMyFollowedUris } from './playlist';
 import { addTracks, getTracks, getTrackUris, removeTracks } from './tracks';
 import type { PlaylistTrack } from './types';
 
 export class SpotifyPlaylistService {
-  constructor(private readonly client: SpotifyWebApi) {}
+  constructor(private readonly client: SpotifyApi) {}
 
   async listMyFollowedUris(): Promise<Set<string>> {
     return getMyFollowedUris(this.client);
