@@ -7,6 +7,7 @@ export const fetchAccessToken = async (
   clientId: string,
   clientSecret: string,
   code: string,
+  redirectUri: string,
 ): Promise<AccessToken> => {
   const url = 'https://accounts.spotify.com/api/token';
   const response = await fetch(url, {
@@ -17,7 +18,8 @@ export const fetchAccessToken = async (
     },
     body: new URLSearchParams({
       grant_type: 'authorization_code',
-      code: code as string,
+      code,
+      redirect_uri: redirectUri,
     }),
   });
 
