@@ -23,7 +23,7 @@
     "lint:fix": "biome check . --write --unsafe",
     "build": "tsup",
     "dev": "tsup --watch",
-    "prepublishOnly": "tsup"
+    "prepare": "tsup"
   },
   "keywords": [
     "spotify",
