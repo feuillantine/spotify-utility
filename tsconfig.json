@@ -8,11 +8,6 @@
     "verbatimModuleSyntax": true,
     "moduleResolution": "Bundler",
     "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "types": [

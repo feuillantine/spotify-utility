@@ -1,7 +1,7 @@
 import type { SpotifyApi } from '@spotify/web-api-ts-sdk';
-import { chunk } from '@/utils/chunk';
-import { withRetry } from '@/utils/retry';
-import { sleep } from '@/utils/sleep';
+import { chunk } from '../utils/chunk';
+import { withRetry } from '../utils/retry';
+import { sleep } from '../utils/sleep';
 import type { PlaylistTrack } from './types';
 
 const PLAYLIST_LIMIT = 50;
@@ -59,11 +59,11 @@ export const getTracks = async (
         .map((item) =>
           item.track
             ? {
-                id: item.track.id,
-                name: item.track.name,
-                uri: item.track.uri,
-                addedAt: item.added_at,
-              }
+              id: item.track.id,
+              name: item.track.name,
+              uri: item.track.uri,
+              addedAt: item.added_at,
+            }
             : null,
         )
         .filter((track) => track !== null) as PlaylistTrack[]),

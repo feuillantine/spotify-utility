@@ -1,5 +1,5 @@
 import type { SpotifyApi } from '@spotify/web-api-ts-sdk';
-import { withRetry } from '@/utils/retry';
+import { withRetry } from '../utils/retry';
 import type { SearchTrackResult } from './types';
 
 /**

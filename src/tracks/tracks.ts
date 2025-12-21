@@ -1,6 +1,6 @@
 import type { SpotifyApi } from '@spotify/web-api-ts-sdk';
-import { withRetry } from '@/utils/retry';
-import { sleep } from '@/utils/sleep';
+import { withRetry } from '../utils/retry';
+import { sleep } from '../utils/sleep';
 
 const SAVED_TRACK_LIMIT = 50;
 const INTERVAL_MS = 150;
