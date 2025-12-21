@@ -1,5 +1,5 @@
 import { type SdkOptions, SpotifyApi } from '@spotify/web-api-ts-sdk';
-import { fetchRefreshedToken } from './auth/token';
+import { fetchRefreshedAccessToken } from './auth/token';
 import { SpotifyPlaylistService } from './playlist/service';
 import { SpotifyTrackService } from './tracks/service';
 
@@ -33,8 +33,11 @@ export const createSpotifyUtility = async (
   credentials: SpotifyCredentials,
   sdkOptions?: SdkOptions,
 ): Promise<SpotifyUtility> => {
-  const token = await fetchRefreshedToken(credentials);
+  const token = await fetchRefreshedAccessToken(
+    credentials.clientId,
+    credentials.clientSecret,
+    credentials.refreshToken,
+  );
   const client = SpotifyApi.withAccessToken(credentials.clientId, token, sdkOptions);
-
   return new SpotifyUtility(client);
 };
