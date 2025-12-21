@@ -15,7 +15,7 @@ export const getUserFavoriteTrackUris = async (client: SpotifyApi): Promise<Set<
 
   while (offset < total) {
     const response = await withRetry(() =>
-      client.currentUser.tracks.savedTracks(SAVED_TRACK_LIMIT, offset),
+      client.currentUser.tracks.savedTracks(SAVED_TRACK_LIMIT, offset, 'JP'),
     );
 
     uris.push(...(response.items ?? []).map((item) => item.track.uri));
