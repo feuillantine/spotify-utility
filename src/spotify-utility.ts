@@ -12,7 +12,7 @@ export interface SpotifyCredentials {
 /**
  * Spotify API を操作するためのユーティリティクラス
  */
-class SpotifyUtility {
+export class SpotifyUtility {
   readonly playlists: SpotifyPlaylistService;
   readonly tracks: SpotifyTrackService;
 
